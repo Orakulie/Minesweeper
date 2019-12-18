@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Minesweeper</title>
+    <style>
+        #punkte {
+            padding-top: 0px;
+            margin-top: 0px;
+            font-size: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .swal-footer {
+            text-align: center;
+        }
+
+        #laden {
+            position: absolute;
+            top:8px;
+            left:630px;
+            background-color: DARKSEAGREEN;
+            border-color: black;
+            border-width: 3px;
+            color: white;
+            font-size: 20px;
+            padding: 10px 10px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;">
+    <canvas id="canvas" height="1208" width="1208" style="background-color: white; width: 604px; height: 604px; "></canvas>
+    <p id="punkte">Punkte: 0</p id>
+    <button id="laden" onclick="load()">Laden</button>
+
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="cell.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
