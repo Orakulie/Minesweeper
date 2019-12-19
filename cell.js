@@ -14,7 +14,7 @@ class Cell {
 
 
         ctx.fillStyle = c;
-        ctx.fillRect(x + 2+2, y + 2+2, scale - 4, scale - 4)
+        ctx.fillRect(x + 2 + 2, y + 2 + 2, scale - 4, scale - 4)
 
     }
 
@@ -28,16 +28,18 @@ class Cell {
 
 
         if (firstClick == true) {
-            this.mine = false;
+            if (this.mine) {
+                this.mine = false;
+            }
             firstClick = false;
         }
 
-        if (this.mine) {
+        if (this.mine && this.visited == false) {
             this.visited = true;
             this.show(this.cellC);
             drawCircle(x, y, "red");
             Punkte(-5);
-        } else if (this.visited == false) {
+        } else if (!this.mine && this.visited == false) {
             this.visited = true;
             this.show(this.cellC);
 
@@ -47,9 +49,9 @@ class Cell {
                     this.mineCounter++;
                 }
             }
-            drawText(x,y);
+            drawText(x, y);
             Punkte(this.mineCounter);
-
+            maxPunkte += this.mineCounter;
             if (this.mineCounter == 0) {
                 for (var i = 0; i < Object.keys(n).length; i++) {
                     n[Object.keys(n)[i]].click();
@@ -73,11 +75,11 @@ class Cell {
             } else {
                 this.click();
                 this.show("yellow");
-                drawText(x,y);
+                drawText(x, y);
                 Punkte(-5);
             }
         }
-        
+
         checkWin();
 
     }

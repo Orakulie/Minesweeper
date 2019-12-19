@@ -3,31 +3,65 @@ canvas.getContext("2d").scale(2, 2);
 const ctx = canvas.getContext("2d");
 
 
-var scale = Math.floor((canvas.width / 2) / 16);
-var rows = Math.floor((canvas.width / 2) / scale);
-var columns = Math.floor((canvas.height / 2) / scale);
-
+var reihen = 16;
+var scale;
+var columns;
+var rows;
 
 var grid = [];
 
 var firstClick = true;
 
 var punkte = 0;
-
+var maxPunkte = 0;
+var expl = 0;
 var minen = 40;
 
 var lineW = 4;
 
 var finished = false;
 
-start();
+swal({
+    title: "Schwierigkeitsstufe",
+    icon: "info",
+    buttons: {
+        leicht: "Leicht",
+        normal: "Normal",
+        schwer: "Schwer",
+    },
 
-function start() {
+})
+    .then((value) => {
+        switch (value) {
+            case "leicht":
+                reihen = 9;
+                minen = 10;
+                start();
+                break;
+            case "normal":
+                reihen = 16;
+                minen = 40;
+                start();
+                break;
+            case "schwer":
+                reihen = 22;
+                minen = 100;
+                start();
+                break;
+        }
+    });
 
+
+function berechneScale() {
+    scale = Math.floor((canvas.width / 2) / reihen);
+    rows = Math.floor((canvas.width / 2) / scale);
+    columns = Math.floor((canvas.height / 2) / scale);
+}
+
+function initGrid() {
     for (var i = 0; i < rows; i++) {
         grid[i] = new Array(columns);
     }
-
     for (var y = 0; y < columns; y++) {
         for (var x = 0; x < rows; x++) {
             var cell = new Cell(x, y);
@@ -35,12 +69,6 @@ function start() {
             grid[x][y].show("DARKSEAGREEN");
         }
     }
-
-    for (var i = 0; i < minen; i++) {
-        grid[random(0, grid.length - 1)][random(0, grid[0].length - 1)].istMine();
-    }
-
-
     ctx.beginPath();
     ctx.strokeStyle = "black";
     ctx.lineWidth = lineW;
@@ -55,7 +83,20 @@ function start() {
         ctx.moveTo(0, (y + 1) * scale + 2);
     }
     ctx.stroke();
+}
 
+function start() {
+
+    berechneScale();
+
+    initGrid();
+
+    for (var i = 0; i < minen; i++) {
+        var x = random(0, grid.length - 1);
+        var y = random(0, grid[0].length - 1)
+        grid[x][y].istMine();
+        //console.log(grid[x][y].mine);
+    }
 }
 
 function mouseClick(event) {
@@ -89,7 +130,7 @@ function random(min = 0, max) {
 function drawCircle(x, y, c) {
     ctx.fillStyle = c;
     ctx.beginPath()
-    ctx.arc(x + (scale / 1.75), y + (scale / 1.75), (scale - 20) / 2, 0, 360)
+    ctx.arc(x + (scale / 2) + 2, y + (scale / 2) + 2, (scale / 2) / 2, 0, 360)
     ctx.fill();
 }
 
@@ -102,8 +143,14 @@ function drawText(x, y) {
 
     if (grid[x / scale][y / scale].mineCounter > 0) {
         ctx.fillStyle = "black";
-        ctx.font = "30px Arial";
-        ctx.fillText(grid[x / scale][y / scale].mineCounter, x + scale / 3, y + scale - 5);
+        var size = scale * 0.81 + "px Arial";
+        ctx.font = size;
+        if (rows < 22) {
+            ctx.fillText(grid[x / scale][y / scale].mineCounter, x + scale * 0.29, y + scale * 0.81);
+        }
+        else {
+            ctx.fillText(grid[x / scale][y / scale].mineCounter, x + scale * 0.34, y + scale * 0.81);
+        }
     }
 }
 
@@ -115,25 +162,35 @@ function checkWin() {
             }
         }
     }
-    finished = true;
-    swal({
-
-        title: "Du hast " + punkte + " Punkte.",
-        text: "Möchtest du das Level mit deinen Freunden teilen?",
-        icon: "success",
-
-        buttons: {
-            save: "Ja",
-            cancel: "Nein",
-        },
-
-    })
-        .then((value) => {
-            console.log(value);
-            if (value) {
-                save();
+    if (!finished) {
+        for (var y = 0; y < columns; y++) {
+            for (var x = 0; x < rows; x++) {
+                if (grid[x][y].mine) {
+                    expl++;
+                }
             }
-        });
+        }
+        maxPunkte += expl * 3;
+        swal({
+
+            title: "Du hast " + punkte + " Punkte.",
+            text: "Möchtest du das Level mit deinen Freunden teilen?",
+            icon: "success",
+
+            buttons: {
+                save: "Ja",
+                cancel: "Nein",
+            },
+
+        })
+            .then((value) => {
+                console.log(value);
+                if (value) {
+                    save();
+                }
+            });
+            finished = true;
+    }
 }
 
 function save() {
@@ -146,11 +203,12 @@ function save() {
         }
     }
     var hexGrid = "";
-    for(var i = 0; i < 256; i+=4) {
-        var temp = shortGrid.substring(i,i+4);
-        temp = parseInt(temp,2).toString(16).toUpperCase();
+    for (var i = 0; i < shortGrid.length; i += 4) {
+        var temp = shortGrid.substring(i, i + 4);
+        temp = parseInt(temp, 2).toString(16).toUpperCase();
         hexGrid += temp;
     }
+    console.log(hexGrid.length);
     dummy.value = hexGrid;
     dummy.select();
     document.execCommand("copy");
@@ -164,25 +222,41 @@ function load() {
     swal({
         title: "Füge den Code für das zu ladende Level hier ein:",
         content: "input",
-    },)
+    })
         .then(code => {
-            if(code) {
-            var binGrid = "";
-            for(var i = 0; i < code.length; i++) {
-                var temp = code[i];
-                temp = parseInt(temp,16).toString(2).padStart(4, '0');;
-                binGrid += temp;
-            }
-            while(binGrid.length < 256) {
-                code = "0"+code;
-            }
-            binGrid = Array.from(binGrid);
-            for (var y = 0; y < columns; y++) {
-                for (var x = 0; x < rows; x++) {
-                    grid[x][y].mine = (binGrid[x+y*columns] == "0") ? false:true;
+            if (code) {
+                var binGrid = "";
+
+                for (var i = 0; i < code.length; i++) {
+                    if (i == code.length - 1 && code.length < 25) {
+                        var temp = code[i];
+                        temp = parseInt(temp, 16).toString(2);
+                        binGrid += temp;
+                    } else {
+                        var temp = code[i];
+                        temp = parseInt(temp, 16).toString(2).padStart(4, '0');
+                        binGrid += temp;
+                    }
                 }
+                while (binGrid.length < 81 && binGrid.length >= 71) {
+                    code = "0" + code;
+                }
+                while (binGrid.length < 256 && binGrid.length >= 246) {
+                    code = "0" + code;
+                }
+                while (binGrid.length < 484 && binGrid.length >= 474) {
+                    code = "0" + code;
+                }
+                reihen = Math.sqrt(binGrid.length);
+                berechneScale();
+                binGrid = Array.from(binGrid);
+                initGrid();
+                for (var y = 0; y < columns; y++) {
+                    for (var x = 0; x < rows; x++) {
+                        grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                    }
+                }
+                finished = false;
             }
-            finished = false;
-        }
         });
 }
