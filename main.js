@@ -21,7 +21,58 @@ var lineW = 4;
 
 var finished = false;
 
+
 swal({
+    title: "Willkommen!",
+    text: "Möchtest du ein neues Level anfangen oder eins laden?",
+    buttons: {
+        neu: "Neues Level",
+        laden: "Laden"
+    },
+})
+    .then((value) => {
+        switch (value) {
+
+            case "neu":
+                swal({
+                    title: "Schwierigkeitsstufe",
+                    icon: "info",
+                    buttons: {
+                        leicht: "Leicht",
+                        normal: "Normal",
+                        schwer: "Schwer",
+                    },
+
+                })
+                    .then((value) => {
+                        switch (value) {
+                            case "leicht":
+                                reihen = 9;
+                                minen = 10;
+                                start();
+                                break;
+                            case "normal":
+                                reihen = 16;
+                                minen = 40;
+                                start();
+                                break;
+                            case "schwer":
+                                reihen = 22;
+                                minen = 100;
+                                start();
+                                break;
+                        }
+                    });
+                break;
+            case "laden":
+                load();
+                break;
+        }
+
+
+    });
+
+/* swal({
     title: "Schwierigkeitsstufe",
     icon: "info",
     buttons: {
@@ -49,7 +100,7 @@ swal({
                 start();
                 break;
         }
-    });
+    }); */
 
 
 function berechneScale() {
@@ -285,16 +336,18 @@ function load() {
 
                 ref.once("value", function (sn) {
                     binGrid = sn.val()
-                    reihen = Math.sqrt(binGrid.length);
-                    berechneScale();
-                    binGrid = Array.from(binGrid);
-                    initGrid();
-                    for (var y = 0; y < columns; y++) {
-                        for (var x = 0; x < rows; x++) {
-                            grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                    if (binGrid) {
+                        reihen = Math.sqrt(binGrid.length);
+                        berechneScale();
+                        binGrid = Array.from(binGrid);
+                        initGrid();
+                        for (var y = 0; y < columns; y++) {
+                            for (var x = 0; x < rows; x++) {
+                                grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                            }
                         }
+                        finished = false;
                     }
-                    finished = false;
                 });
 
             }
