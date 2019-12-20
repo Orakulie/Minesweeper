@@ -8,10 +8,33 @@
     <title>Minesweeper</title>
     <style>
         #punkte {
-            padding-top: 0px;
-            margin-top: 0px;
+            position: relative;
+            margin-left: 10px;
+            margin-top: 10px;
             font-size: 20px;
             font-family: Arial, Helvetica, sans-serif;
+            width: 200px;
+            display: inline-block;
+        }
+
+        #canvas {
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        #controls {
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+            width: 600px;
+            height: auto;
+            display: block;
+            border: 4px solid black;
+            border-top: none;
+        }
+        #wrapper {
+            
         }
 
         .swal-footer {
@@ -21,48 +44,62 @@
         .swal-title {
             font-family: Arial, Helvetica, sans-serif;
         }
+
         .swal-text {
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        .swal-overlay {
+            background-color: DARKSEAGREEN;
+        }
+
         #laden {
-            position: absolute;
-            top: 8px;
-            left: 630px;
+            position: relative;
+            
+            margin-top:10px;
+
+            display: inline-block;
             background-color: DARKSEAGREEN;
             border-color: black;
             border-width: 3px;
             color: white;
             font-size: 20px;
             padding: 10px 10px;
-            margin-right: 20px;
             height: 50px;
             width: 85px;
         }
 
         #teilen {
-            position: absolute;
-            top: 65px;
-            left: 630px;
+            position: relative;
+            
+            margin-left: auto;
+            display: inline-block;
             background-color: DARKSEAGREEN;
             border-color: black;
             border-width: 3px;
             color: white;
             font-size: 20px;
             padding: 10px 10px;
-            margin-right: 20px;
             height: 50px;
             width: 85px;
         }
     </style>
 </head>
 
-<body oncontextmenu="return false;">
-    <canvas id="canvas" height="1212" width="1212"
-        style="background-color: white; width: 606px; height: 606px; "></canvas>
-    <p id="punkte">Punkte: 0</p id>
-    <button id="laden" onclick="load()">Laden</button>
-    <button id="teilen" onclick="save()">Teilen</button>
+<body oncontextmenu="return false;" style="background-color:white">
+
+    <div id="wapper">
+        <canvas id="canvas" height="1212" width="1212"
+            style="background-color: white; width: 606px; height: 606px; "></canvas>
+        <div id="controls">
+            <p id="punkte">Punkte: 0</p id>
+            <button id="laden" onclick="load()">Laden</button>
+            <button id="teilen" onclick="save()">Teilen</button>
+        </div>
+    </div>
+
+
+
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-app.js"></script>
