@@ -109,6 +109,12 @@ function berechneScale() {
 }
 
 function initGrid() {
+
+    punkte = 0;
+    maxPunkte = 0;
+    expl = 0;
+
+
     for (var i = 0; i < rows; i++) {
         grid[i] = new Array(columns);
     }
@@ -152,12 +158,12 @@ function start() {
 function mouseClick(event) {
     var mX = mousePos(event).x;
     var mY = mousePos(event).y;
-    
-  //  console.log("X: "+mX +" Y: "+mY)
+
+    //  console.log("X: "+mX +" Y: "+mY)
     if (event.button === 0 && !finished) {
         for (var y = 0; y < columns; y++) {
             for (var x = 0; x < rows; x++) {
-                if (mX >= grid[x][y].x * scale  +lineW&& mX <= grid[x][y].x * scale + scale&& mY >= grid[x][y].y * scale + lineW && mY <= grid[x][y].y * scale + scale) {
+                if (mX >= grid[x][y].x * scale + lineW && mX <= grid[x][y].x * scale + scale && mY >= grid[x][y].y * scale + lineW && mY <= grid[x][y].y * scale + scale) {
                     grid[x][y].click();
                 }
             }
@@ -165,7 +171,7 @@ function mouseClick(event) {
     } else if (event.button == 2 && !finished) {
         for (var y = 0; y < columns; y++) {
             for (var x = 0; x < rows; x++) {
-                if (mX >= grid[x][y].x * scale  +lineW&& mX <= grid[x][y].x * scale + scale&& mY >= grid[x][y].y * scale + lineW && mY <= grid[x][y].y * scale + scale) {
+                if (mX >= grid[x][y].x * scale + lineW && mX <= grid[x][y].x * scale + scale && mY >= grid[x][y].y * scale + lineW && mY <= grid[x][y].y * scale + scale) {
                     grid[x][y].clickR();
                 }
             }
@@ -176,7 +182,7 @@ function mouseClick(event) {
 
 function mousePos(event) {
     var rec = canvas.getBoundingClientRect();
-    return { x:event.clientX-rec.left,y:event.clientY-rec.top};
+    return { x: event.clientX - rec.left, y: event.clientY - rec.top };
 }
 document.addEventListener("mousedown", mouseClick);
 
