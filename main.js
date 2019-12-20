@@ -20,6 +20,9 @@ var minen = 40;
 var lineW = 4;
 var finished = false;
 
+var user = "testUser";
+var alleUser
+var userID;
 
 swal({
     title: "Willkommen!",
@@ -218,6 +221,31 @@ function drawText(x, y) {
     }
 }
 
+function uploadPoints(number) {
+    var ref = firebase.database().ref(number + "/User/" + userID +"/Punkte");
+    ref.set("Punkte:"+punkte);
+}
+
+function addUser(number) {
+    var ref = firebase.database().ref(number + "/User");
+    ref.once("value", function (sn) {
+        if (sn.val()) {
+            var users = sn.val();
+            userID = users.length;
+            users.push({Name: user, Punkte: punkte});
+            ref.set(users);
+        }
+    });
+}
+
+function downloadUser(number) {
+    var ref = firebase.database().ref(number+"/User");
+    ref.once("value", function (sn) {
+         return sn.val();
+    });
+}
+
+
 function checkWin() {
     for (var y = 0; y < columns; y++) {
         for (var x = 0; x < rows; x++) {
@@ -292,7 +320,13 @@ function save() {
             shortGrid += (grid[x][y].mine) ? 1 : 0;
         }
     }
-    firebase.database().ref(number).set(shortGrid);
+    /*     var ref = firebase.database().ref(number+"/Grid");
+        ref.set(shortGrid);
+        ref = firebase.database().ref(number+"/User/");
+        ref.set([user]); */
+    var ref = firebase.database().ref(number);
+    ref.set({ Grid: shortGrid, User: [{Name:user,Punkte:punkte}]});
+    userID = 0;
 }
 
 function load() {
