@@ -24,6 +24,8 @@ var user;
 var userID;
 var online = -1;
 
+var startTime;
+var time;
 
 swal({
     title: "Willkommen!",
@@ -204,8 +206,10 @@ function drawCircle(x, y, c) {
 
 function Punkte(x) {
     punkte += x;
+    time = new Date().getTime() / 1000 - startTime;
     if (online == -1) {
-        document.getElementById("punkte").innerHTML = user + ": " + punkte;
+        document.getElementById("punkte").innerHTML = user + ": " + punkte+ 
+         " || "+ time;
     } else {
         uploadPoints();
     }
@@ -229,6 +233,8 @@ function drawText(x, y) {
 function uploadPoints() {
     var ref = firebase.database().ref(online + "/User/" + userID + "/Punkte");
     ref.set(punkte);
+    var ref = firebase.database().ref(online + "/User/" + userID + "/Zeit");
+    ref.set(Math.floor(time));
 }
 
 function addUser() {
@@ -250,7 +256,7 @@ function rangliste(u) {
     document.getElementById("punkte").innerHTML = "";
     u.sort(function (a, b) { return b.Punkte - a.Punkte });
     for (var k in u) {
-        document.getElementById("punkte").innerHTML += u[k].Name + ": " + u[k].Punkte + "<br>";
+        document.getElementById("punkte").innerHTML += u[k].Name + ": " + u[k].Punkte + " || " + u[k].Zeit+"s"+"<br>";
     }
 }
 
@@ -260,6 +266,7 @@ function downloadUser() {
         rangliste(sn.val());
     });
 }
+
 
 
 function checkWin() {
@@ -352,6 +359,7 @@ function executeSave() {
         title: "Gespeichert!",
         text: "Das Level wurde unter " + number + " gespeichert",
     })
+    document.title = number;
     var shortGrid = "";
     for (var y = 0; y < columns; y++) {
         for (var x = 0; x < rows; x++) {
@@ -363,6 +371,7 @@ function executeSave() {
     online = number;
     downloadUser();
     userID = 0;
+    startTime = new Date().getTime() /1000;
 }
 
 function load() {
@@ -440,7 +449,7 @@ function load() {
 function executeLoad(code) {
     var ref = firebase.database().ref(code + "/Grid");
     var binGrid = "";
-
+    document.title = code;
     ref.once("value", function (sn) {
         binGrid = sn.val();
         if (binGrid) {
@@ -457,6 +466,7 @@ function executeLoad(code) {
             online = code;
             addUser();
             downloadUser();
+            startTime = new Date().getTime() / 1000;
         }
     });
 }
