@@ -14,24 +14,20 @@
             font-size: 20px;
             font-family: Arial, Helvetica, sans-serif;
             width: 200px;
-            display: inline-block;
+            display: block;
         }
 
         #canvas {
-            position: relative;
-            margin-left: auto;
-            margin-right: auto;
+
+            margin: 0 auto;
             display: block;
+
         }
+
         #controls {
-            position: relative;
-            margin-left: auto;
-            margin-right: auto;
-            width: 600px;
-            height: auto;
-            display: block;
+            position: absolute;
+            float: left;
             border: 4px solid black;
-            border-top: none;
         }
 
         .swal-footer {
@@ -49,13 +45,22 @@
         .swal-overlay {
             background-color: DARKSEAGREEN;
         }
-
-        #laden {
-            position: relative;
-            
+        #wapper {
+            margin-left: 5px;
+            margin-right: 5px;
             margin-top:10px;
+        }
+        .button {
+            position: relative;
+
+            margin-top: 10px;
+
 
             display: inline-block;
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+
             background-color: DARKSEAGREEN;
             border-color: black;
             border-width: 3px;
@@ -66,19 +71,14 @@
             width: 85px;
         }
 
-        #teilen {
-            position: relative;
+        #rank {
+            position: absolute;
+            border: 4px solid black;
+            float: left;
             
-            margin-left: auto;
-            display: inline-block;
-            background-color: DARKSEAGREEN;
-            border-color: black;
-            border-width: 3px;
-            color: white;
             font-size: 20px;
-            padding: 10px 10px;
-            height: 50px;
-            width: 85px;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 5px;
         }
     </style>
 </head>
@@ -86,13 +86,13 @@
 <body oncontextmenu="return false;" style="background-color:white">
 
     <div id="wapper">
+        <div id="controls">
+            <p id="punkte">Player 1: 0</p id>
+            <button id="laden" class="button" onclick="load()">Laden</button>
+            <button id="teilen" class="button" onclick="save()">Teilen</button>
+        </div>
         <canvas id="canvas" height="1212" width="1212"
             style="background-color: white; width: 606px; height: 606px; "></canvas>
-        <div id="controls">
-            <p id="punkte">Punkte: 0</p id>
-            <button id="laden" onclick="load()">Laden</button>
-            <button id="teilen" onclick="save()">Teilen</button>
-        </div>
     </div>
 
 

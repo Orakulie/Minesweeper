@@ -21,8 +21,9 @@ var lineW = 4;
 var finished = false;
 
 var user = "testUser";
-var alleUser
 var userID;
+var online = -1;
+
 
 swal({
     title: "Willkommen!",
@@ -203,7 +204,11 @@ function drawCircle(x, y, c) {
 
 function Punkte(x) {
     punkte += x;
-    document.getElementById("punkte").innerHTML = "Punkte: " + punkte;
+    if(online == -1) {
+    document.getElementById("punkte").innerHTML = user + ": " + punkte;
+    } else {
+        uploadPoints();
+    }
 }
 
 function drawText(x, y) {
@@ -221,27 +226,36 @@ function drawText(x, y) {
     }
 }
 
-function uploadPoints(number) {
-    var ref = firebase.database().ref(number + "/User/" + userID +"/Punkte");
-    ref.set("Punkte:"+punkte);
+function uploadPoints() {
+    var ref = firebase.database().ref(online + "/User/" + userID + "/Punkte");
+    ref.set("Punkte:" + punkte);
 }
 
-function addUser(number) {
-    var ref = firebase.database().ref(number + "/User");
+function addUser() {
+    var ref = firebase.database().ref(online + "/User");
     ref.once("value", function (sn) {
         if (sn.val()) {
             var users = sn.val();
             userID = users.length;
-            users.push({Name: user, Punkte: punkte});
+            users.push({ Name: user, Punkte: punkte });
             ref.set(users);
         }
     });
 }
 
-function downloadUser(number) {
-    var ref = firebase.database().ref(number+"/User");
-    ref.once("value", function (sn) {
-         return sn.val();
+function rangliste(u) {
+    document.getElementById("punkte").innerHTML = "";
+    for (var k in u) {
+        console.log(u[k].Punkte);
+        document.getElementById("punkte").innerHTML += u[k].Name + ": " + u[k].Punkte + "<br>";
+    }
+}
+
+function downloadUser() {
+    document.getElementById("punkte").innerHTML = "";
+    var ref = firebase.database().ref(online + "/User");
+    ref.on("value", function (sn) {
+        rangliste(sn.val());
     });
 }
 
@@ -277,7 +291,7 @@ function checkWin() {
         })
             .then((value) => {
                 console.log(value);
-                if (value) {
+                if (value && online == -1) {
                     save();
                 }
             });
@@ -325,8 +339,9 @@ function save() {
         ref = firebase.database().ref(number+"/User/");
         ref.set([user]); */
     var ref = firebase.database().ref(number);
-    ref.set({ Grid: shortGrid, User: [{Name:user,Punkte:punkte}]});
+    ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte }] });
     userID = 0;
+    updateRangliste = setInterval(rangliste, 1000);
 }
 
 function load() {
@@ -378,11 +393,11 @@ function load() {
     })
         .then(code => {
             if (code) {
-                var ref = firebase.database().ref(code);
+                var ref = firebase.database().ref(code+"/Grid");
                 var binGrid = "";
 
                 ref.once("value", function (sn) {
-                    binGrid = sn.val()
+                    binGrid = sn.val();
                     if (binGrid) {
                         reihen = Math.sqrt(binGrid.length);
                         berechneScale();
@@ -394,6 +409,9 @@ function load() {
                             }
                         }
                         finished = false;
+                        online = code;
+                        addUser();
+                        downloadUser();
                     }
                 });
 
