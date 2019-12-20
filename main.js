@@ -189,12 +189,12 @@ function checkWin() {
                     save();
                 }
             });
-            finished = true;
+        finished = true;
     }
 }
 
 function save() {
-    var dummy = document.createElement("textarea");
+    /* var dummy = document.createElement("textarea");
     document.body.appendChild(dummy);
     var shortGrid = "";
     for (var y = 0; y < columns; y++) {
@@ -214,11 +214,25 @@ function save() {
     document.execCommand("copy");
     document.body.removeChild(dummy);
 
-    swal("Kopiert!", "Der Code für das Level wurde in deine Zwischenablage gelegt!", "success");
+    swal("Kopiert!", "Der Code für das Level wurde in deine Zwischenablage gelegt!", "success"); */
+
+    var number = random(0, 9);
+    swal({
+        icon: "success",
+        title: "Gespeichert!",
+        text: "Das Level wurde unter " + number + " gespeichert",
+    })
+    var shortGrid = "";
+    for (var y = 0; y < columns; y++) {
+        for (var x = 0; x < rows; x++) {
+            shortGrid += (grid[x][y].mine) ? 1 : 0;
+        }
+    }
+    firebase.database().ref(number).set(shortGrid);
 }
 
 function load() {
-    finished = true;
+    /* finished = true;
     swal({
         title: "Füge den Code für das zu ladende Level hier ein:",
         content: "input",
@@ -258,5 +272,32 @@ function load() {
                 }
                 finished = false;
             }
+        }); */
+    finished = true;
+    swal({
+        title: "Füge den Code für das zu ladende Level hier ein:",
+        content: "input",
+    })
+        .then(code => {
+            if (code) {
+                var ref = firebase.database().ref(code);
+                var binGrid = "";
+
+                ref.once("value", function (sn) {
+                    binGrid = sn.val()
+                    reihen = Math.sqrt(binGrid.length);
+                    berechneScale();
+                    binGrid = Array.from(binGrid);
+                    initGrid();
+                    for (var y = 0; y < columns; y++) {
+                        for (var x = 0; x < rows; x++) {
+                            grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                        }
+                    }
+                    finished = false;
+                });
+
+            }
+
         });
 }

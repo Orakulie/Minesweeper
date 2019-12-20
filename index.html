@@ -17,14 +17,15 @@
         .swal-footer {
             text-align: center;
         }
+
         .swal-title {
             font-family: Arial, Helvetica, sans-serif;
         }
 
         #laden {
             position: absolute;
-            top:8px;
-            left:630px;
+            top: 8px;
+            left: 630px;
             background-color: DARKSEAGREEN;
             border-color: black;
             border-width: 3px;
@@ -32,13 +33,14 @@
             font-size: 20px;
             padding: 10px 10px;
             margin-right: 20px;
-            height:50px;
+            height: 50px;
             width: 85px;
         }
+
         #teilen {
             position: absolute;
-            top:65px;
-            left:630px;
+            top: 65px;
+            left: 630px;
             background-color: DARKSEAGREEN;
             border-color: black;
             border-width: 3px;
@@ -46,17 +48,45 @@
             font-size: 20px;
             padding: 10px 10px;
             margin-right: 20px;
-            height:50px;
+            height: 50px;
             width: 85px;
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
-    <canvas id="canvas" height="1212" width="1212" style="background-color: white; width: 606px; height: 606px; "></canvas>
+    <canvas id="canvas" height="1212" width="1212"
+        style="background-color: white; width: 606px; height: 606px; "></canvas>
     <p id="punkte">Punkte: 0</p id>
     <button id="laden" onclick="load()">Laden</button>
     <button id="teilen" onclick="save()">Teilen</button>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCh_ZFMmsl1U3A5hgvlRF5oe9PXflHh_Sk",
+            authDomain: "minesweeper-ca4b6.firebaseapp.com",
+            databaseURL: "https://minesweeper-ca4b6.firebaseio.com",
+            projectId: "minesweeper-ca4b6",
+            storageBucket: "minesweeper-ca4b6.appspot.com",
+            messagingSenderId: "1048357315156",
+            appId: "1:1048357315156:web:5d219c62095a285ec8c3c1",
+            measurementId: "G-P95ZDD5348"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+        firebase.analytics();
+    </script>
 
 
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
