@@ -20,7 +20,7 @@ var minen = 40;
 var lineW = 4;
 var finished = false;
 
-var user = "testUser";
+var user;
 var userID;
 var online = -1;
 
@@ -204,8 +204,8 @@ function drawCircle(x, y, c) {
 
 function Punkte(x) {
     punkte += x;
-    if(online == -1) {
-    document.getElementById("punkte").innerHTML = user + ": " + punkte;
+    if (online == -1) {
+        document.getElementById("punkte").innerHTML = user + ": " + punkte;
     } else {
         uploadPoints();
     }
@@ -228,7 +228,7 @@ function drawText(x, y) {
 
 function uploadPoints() {
     var ref = firebase.database().ref(online + "/User/" + userID + "/Punkte");
-    ref.set("Punkte:" + punkte);
+    ref.set(punkte);
 }
 
 function addUser() {
@@ -236,6 +236,9 @@ function addUser() {
     ref.once("value", function (sn) {
         if (sn.val()) {
             var users = sn.val();
+            if (user == "") {
+                user = "Player " + users.length;
+            }
             userID = users.length;
             users.push({ Name: user, Punkte: punkte });
             ref.set(users);
@@ -245,14 +248,13 @@ function addUser() {
 
 function rangliste(u) {
     document.getElementById("punkte").innerHTML = "";
+    u.sort(function (a, b) { return b.Punkte - a.Punkte });
     for (var k in u) {
-        console.log(u[k].Punkte);
         document.getElementById("punkte").innerHTML += u[k].Name + ": " + u[k].Punkte + "<br>";
     }
 }
 
 function downloadUser() {
-    document.getElementById("punkte").innerHTML = "";
     var ref = firebase.database().ref(online + "/User");
     ref.on("value", function (sn) {
         rangliste(sn.val());
@@ -277,25 +279,27 @@ function checkWin() {
             }
         }
         maxPunkte += expl * 3;
-        swal({
+        if (online == -1) {
+            swal({
 
-            title: "Du hast " + punkte + " Punkte.",
-            text: "Möchtest du das Level mit deinen Freunden teilen?",
-            icon: "success",
+                title: "Du hast " + punkte + " Punkte.",
+                text: "Möchtest du das Level mit deinen Freunden teilen?",
+                icon: "success",
 
-            buttons: {
-                save: "Ja",
-                cancel: "Nein",
-            },
+                buttons: {
+                    save: "Ja",
+                    cancel: "Nein",
+                },
 
-        })
-            .then((value) => {
-                console.log(value);
-                if (value && online == -1) {
-                    save();
-                }
-            });
-        finished = true;
+            })
+                .then((value) => {
+
+                    if (value) {
+                        save();
+                    }
+                });
+            finished = true;
+        }
     }
 }
 
@@ -321,7 +325,27 @@ function save() {
     document.body.removeChild(dummy);
 
     swal("Kopiert!", "Der Code für das Level wurde in deine Zwischenablage gelegt!", "success"); */
+    if(!user) {
+    swal({
+        title: "Name",
+        text: "Wie möchtest du heißen?",
+        content: "input",
+    })
+        .then(gname => {
 
+            if (gname != "") {
+                user = gname;
+            } else {
+                user = "Player 0";
+            }
+            executeSave();
+
+        });}else {
+            executeSave();
+        }
+}
+
+function executeSave() {
     var number = random(0, 9);
     swal({
         icon: "success",
@@ -334,14 +358,11 @@ function save() {
             shortGrid += (grid[x][y].mine) ? 1 : 0;
         }
     }
-    /*     var ref = firebase.database().ref(number+"/Grid");
-        ref.set(shortGrid);
-        ref = firebase.database().ref(number+"/User/");
-        ref.set([user]); */
     var ref = firebase.database().ref(number);
     ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte }] });
+    online = number;
+    downloadUser();
     userID = 0;
-    updateRangliste = setInterval(rangliste, 1000);
 }
 
 function load() {
@@ -392,30 +413,54 @@ function load() {
         content: "input",
     })
         .then(code => {
-            if (code) {
-                var ref = firebase.database().ref(code+"/Grid");
-                var binGrid = "";
+            if (code && !user) {
 
-                ref.once("value", function (sn) {
-                    binGrid = sn.val();
-                    if (binGrid) {
-                        reihen = Math.sqrt(binGrid.length);
-                        berechneScale();
-                        binGrid = Array.from(binGrid);
-                        initGrid();
-                        for (var y = 0; y < columns; y++) {
-                            for (var x = 0; x < rows; x++) {
-                                grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
-                            }
+                swal({
+                    title: "Name",
+                    text: "Wie möchtest du heißen?",
+                    content: "input",
+                })
+                    .then(gname => {
+
+                        if (gname != "") {
+                            user = gname;
                         }
-                        finished = false;
-                        online = code;
-                        addUser();
-                        downloadUser();
-                    }
-                });
+                        executeLoad(code);
 
+                    });
+            }else if(code && user) {
+                executeLoad(code);
             }
 
+
         });
+}
+
+
+function executeLoad(code) {
+    var ref = firebase.database().ref(code + "/Grid");
+    var binGrid = "";
+
+    ref.once("value", function (sn) {
+        binGrid = sn.val();
+        if (binGrid) {
+            reihen = Math.sqrt(binGrid.length);
+            berechneScale();
+            binGrid = Array.from(binGrid);
+            initGrid();
+            for (var y = 0; y < columns; y++) {
+                for (var x = 0; x < rows; x++) {
+                    grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                }
+            }
+            finished = false;
+            online = code;
+            addUser();
+            downloadUser();
+        }
+    });
+}
+
+function getName() {
+
 }
