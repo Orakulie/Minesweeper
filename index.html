@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Minesweeper</title>
+    <style>
+        #punkte {
+            position: relative;
+            margin-left: 10px;
+            margin-top: 10px;
+            width: 200px;
+            display: block;
+        }
+
+        #canvas {
+
+            margin: 0 auto;
+            display: block;
+            background-color: #005f20a1;
+
+        }
+
+        #controls {
+            position: absolute;
+            float: left;
+            border: 4px solid black;
+            background-color: DARKSEAGREEN;
+            font-size: 20px;
+        }
+
+        .swal-footer {
+            text-align: center;
+        }
+
+
+        .swal-overlay {
+            background-color: DARKSEAGREEN;
+        }
+
+        #wapper {
+            margin-left: 5px;
+            margin-right: 5px;
+            margin-top: 10px;
+        }
+
+        .button {
+            position: relative;
+
+            margin-top: 10px;
+
+
+            display: inline-block;
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+            background-color: #005f20a1;
+            border-color: black;
+            border-width: 3px;
+            color: white;
+            font-size: 20px;
+            padding: 10px 10px;
+            height: 50px;
+            width: 85px;
+        }
+
+        #rank {
+            position: absolute;
+            border: 4px solid black;
+            float: left;
+
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        h1 {
+            font-size: 50px;
+            margin: 0 auto;
+            display: block;
+            width: fit-content;
+        }
+
+        #regeln {
+            position: absolute;
+            padding: 5px;
+            float: right;
+            right: 10px;
+            width: 300px;
+            border: 4px solid black;
+            background-color: DARKSEAGREEN;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;" style="background-color:#005f20a1; font-family: Arial, Helvetica, sans-serif;">
+
+    <div id="wapper">
+        <h1> Minesweeper</h1>
+        <div id="controls">
+            <p id="punkte">Player: 0 || 0s</p id>
+            <button id="laden" class="button" onclick="load()">Laden</button>
+            <button id="teilen" class="button" onclick="save()">Teilen</button>
+        </div>
+        <div id="regeln">
+            <p>•Linksklick um Felder aufzudecken</p>
+            <p>•Rechtsklick um Minen zu entschärfen</p>
+            <p>•Wenn du eine Mine aufdeckst, ohne sie zu entschärfen gibt es 5 Punkte Abzug.</p>
+            <p>•Solltest du versuchst ein Feld zu entschärfen, welches keine Mine ist, gibt es ebenfalls 5 Punkte Abzug.
+            </p>
+            <p>•Wenn du eine Mine richtig entschärfst, bekommst du 3 Punkte.</p>
+        </div>
+        <canvas id="canvas" height="1212" width="1212"
+            style="background-color: #005f20a1; width: 606px; height: 606px; "></canvas>
+    </div>
+
+
+
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-analytics.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-auth.js"></script> -->
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCh_ZFMmsl1U3A5hgvlRF5oe9PXflHh_Sk",
+            authDomain: "minesweeper-ca4b6.firebaseapp.com",
+            databaseURL: "https://minesweeper-ca4b6.firebaseio.com",
+            projectId: "minesweeper-ca4b6",
+            storageBucket: "minesweeper-ca4b6.appspot.com",
+            messagingSenderId: "1048357315156",
+            appId: "1:1048357315156:web:5d219c62095a285ec8c3c1",
+            measurementId: "G-P95ZDD5348"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+        firebase.analytics();
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="/scripts/cell.js"></script>
+    <script src="/scripts/main.js"></script>
+</body>
+
+</html>
