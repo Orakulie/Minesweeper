@@ -395,7 +395,8 @@ function load() {
 
                         if (gname != "") {
                             user = gname;
-                        } executeLoad(code);
+                        }
+                        executeLoad(code);
 
                     });
             } else if (code && user) {
