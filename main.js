@@ -230,7 +230,10 @@ function addUser() {
                 user = "Player " + users.length;
             }
             userID = users.length;
-            users.push({ Name: user, Punkte: punkte, IP: ip });
+            if (ip)
+                users.push({ Name: user, Punkte: punkte, IP: ip });
+            else
+                users.push({ Name: user, Punkte: punkte });
             ref.set(users);
         }
     });
@@ -410,15 +413,16 @@ function load() {
 
 function executeLoad(code) {
     ctx.fillStyle = "#005f20a1";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     var ref = firebase.database().ref(code);
     ref.once("value", function (sn) {
         if (sn.val()) {
             var temp = sn.val();
             var bereitsGespielt = false;
             for (var x in temp.User) {
-                if (temp.User[x].IP == ip) {
+                if (temp.User[x].IP == ip && ip) {
                     bereitsGespielt = true;
+                    console.log(ip);
                 }
             }
 
