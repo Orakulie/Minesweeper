@@ -27,7 +27,7 @@ var online = -1;
 var startTime;
 var time;
 
-/* swal({
+swal({
     title: "Willkommen!",
     text: "Möchtest du ein neues Level anfangen oder eins laden?",
     buttons: {
@@ -75,10 +75,8 @@ var time;
         }
 
 
-    }); */
-reihen = 9;
-minen = 10;
-start();
+    });
+
 
 function berechneScale() {
     scale = Math.floor((canvas.width / 2) / reihen);
@@ -311,7 +309,7 @@ function checkWin() {
 
 function save() {
     finished = true;
-    if (!user) {
+    if (user == "Player") {
         swal({
             title: "Name",
             text: "Wie möchtest du heißen?",
@@ -319,7 +317,7 @@ function save() {
         })
             .then(gname => {
 
-                if (gname != "") {
+                if (gname) {
                     user = gname;
                 } else {
                     user = "Player 0";
