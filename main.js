@@ -20,7 +20,9 @@ var minen = 40;
 var lineW = 4;
 var finished = false;
 
-var user;
+var fertig = false;
+
+var user = "Player";
 var userID;
 var online = -1;
 
@@ -174,7 +176,6 @@ function drawCircle(x, y, c) {
 function Punkte(x) {
     punkte += x;
     time = new Date().getTime() / 1000 - startTime;
-    user = "Player";
     if (online == -1) {
         document.getElementById("punkte").innerHTML = user + ": " + punkte +
             " || " + Math.floor(time) + "s";
@@ -210,6 +211,7 @@ function uploadPoints() {
             }
         }
     }
+    fertig = true;
     var ref = firebase.database().ref(online + "/User/" + userID + "/Fertig");
     ref.set(1);
 }
@@ -219,7 +221,7 @@ function addUser() {
     ref.once("value", function (sn) {
         if (sn.val()) {
             var users = sn.val();
-            if (!user) {
+            if (user == "Player") {
                 user = "Player " + users.length;
             }
             userID = users.length;
@@ -290,12 +292,14 @@ function checkWin() {
                 .then((value) => {
 
                     if (value) {
+                        finished = true;
                         save();
                     }
                 });
             document.getElementById("punkte").innerHTML = user + ": " + punkte +
                 " || " + Math.floor(time) + "s ✅";
             finished = true;
+            fertig = true;
         } else {
             swal({
                 title: "Nicht schlecht!",
@@ -303,6 +307,7 @@ function checkWin() {
                 icon: "success",
             });
             finished = true;
+            fertig = true;
         }
     }
 }
@@ -355,7 +360,11 @@ function executeSave() {
             }
         }
         var ref = firebase.database().ref(number);
-        ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte }] });
+        console.log(finished);
+        if(fertig == false){
+        ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte,Zeit: Math.floor(time) }] });} else {
+            ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte,Zeit: Math.floor(time),Fertig: 1 }] });
+        }
         var ref = firebase.database().ref("/Aktuell");
         ref.set(number + 1);
         online = number;
