@@ -32,6 +32,7 @@ class Cell {
                 this.mine = false;
             }
             firstClick = false;
+            startTime = new Date().getTime() /1000;
         }
 
         if (this.mine && this.visited == false) {

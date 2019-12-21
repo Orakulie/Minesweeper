@@ -27,7 +27,7 @@ var online = -1;
 var startTime;
 var time;
 
-swal({
+/* swal({
     title: "Willkommen!",
     text: "Möchtest du ein neues Level anfangen oder eins laden?",
     buttons: {
@@ -75,38 +75,10 @@ swal({
         }
 
 
-    });
-
-/* swal({
-    title: "Schwierigkeitsstufe",
-    icon: "info",
-    buttons: {
-        leicht: "Leicht",
-        normal: "Normal",
-        schwer: "Schwer",
-    },
-
-})
-    .then((value) => {
-        switch (value) {
-            case "leicht":
-                reihen = 9;
-                minen = 10;
-                start();
-                break;
-            case "normal":
-                reihen = 16;
-                minen = 40;
-                start();
-                break;
-            case "schwer":
-                reihen = 22;
-                minen = 100;
-                start();
-                break;
-        }
     }); */
-
+reihen = 9;
+minen = 10;
+start();
 
 function berechneScale() {
     scale = Math.floor((canvas.width / 2) / reihen);
@@ -157,15 +129,12 @@ function start() {
         var x = random(0, grid.length - 1);
         var y = random(0, grid[0].length - 1)
         grid[x][y].istMine();
-        //console.log(grid[x][y].mine);
     }
 }
 
 function mouseClick(event) {
     var mX = mousePos(event).x;
     var mY = mousePos(event).y;
-
-    //  console.log("X: "+mX +" Y: "+mY)
     if (event.button === 0 && !finished) {
         for (var y = 0; y < columns; y++) {
             for (var x = 0; x < rows; x++) {
@@ -207,9 +176,10 @@ function drawCircle(x, y, c) {
 function Punkte(x) {
     punkte += x;
     time = new Date().getTime() / 1000 - startTime;
+    user = "Player";
     if (online == -1) {
-        document.getElementById("punkte").innerHTML = user + ": " + punkte+ 
-         " || "+ time;
+        document.getElementById("punkte").innerHTML = user + ": " + punkte +
+            " || " + Math.floor(time) + "s";
     } else {
         uploadPoints();
     }
@@ -235,6 +205,15 @@ function uploadPoints() {
     ref.set(punkte);
     var ref = firebase.database().ref(online + "/User/" + userID + "/Zeit");
     ref.set(Math.floor(time));
+    for (var y = 0; y < columns; y++) {
+        for (var x = 0; x < rows; x++) {
+            if (grid[x][y].visited == false) {
+                return;
+            }
+        }
+    }
+    var ref = firebase.database().ref(online + "/User/" + userID + "/Fertig");
+    ref.set(1);
 }
 
 function addUser() {
@@ -242,7 +221,7 @@ function addUser() {
     ref.once("value", function (sn) {
         if (sn.val()) {
             var users = sn.val();
-            if (user == "") {
+            if (!user) {
                 user = "Player " + users.length;
             }
             userID = users.length;
@@ -256,7 +235,18 @@ function rangliste(u) {
     document.getElementById("punkte").innerHTML = "";
     u.sort(function (a, b) { return b.Punkte - a.Punkte });
     for (var k in u) {
-        document.getElementById("punkte").innerHTML += u[k].Name + ": " + u[k].Punkte + " || " + u[k].Zeit+"s"+"<br>";
+        document.getElementById("punkte").innerHTML += u[k].Name + ": " + u[k].Punkte + " || ";
+        if (u[k].Zeit) {
+            document.getElementById("punkte").innerHTML += u[k].Zeit + "s";
+        } else {
+            document.getElementById("punkte").innerHTML += "0s" + "<br>";
+        }
+        if(u[k].Fertig)
+        {
+            document.getElementById("punkte").innerHTML += " ✅<br>";
+        } else {
+            document.getElementById("punkte").innerHTML += "<br>";
+        }
     }
 }
 
@@ -289,7 +279,7 @@ function checkWin() {
         if (online == -1) {
             swal({
 
-                title: "Du hast " + punkte + " Punkte.",
+                title: "Du hast " + punkte + " Punkte von möglichen " + maxPunkte + " Punkten.",
                 text: "Möchtest du das Level mit deinen Freunden teilen?",
                 icon: "success",
 
@@ -305,117 +295,78 @@ function checkWin() {
                         save();
                     }
                 });
+            document.getElementById("punkte").innerHTML = user + ": " + punkte +
+                " || " + Math.floor(time) + "s ✅";
+            finished = true;
+        } else {
+            swal({
+                title: "Nicht schlecht!",
+                text: "Du hast " + punkte + " Punkten von möglichen " + maxPunkte + " Punkten erreicht!",
+                icon: "success",
+            });
             finished = true;
         }
     }
 }
 
 function save() {
-    /* var dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    var shortGrid = "";
-    for (var y = 0; y < columns; y++) {
-        for (var x = 0; x < rows; x++) {
-            shortGrid += (grid[x][y].mine) ? 1 : 0;
-        }
+    finished = true;
+    if (!user) {
+        swal({
+            title: "Name",
+            text: "Wie möchtest du heißen?",
+            content: "input",
+        })
+            .then(gname => {
+
+                if (gname != "") {
+                    user = gname;
+                } else {
+                    user = "Player 0";
+                }
+                executeSave();
+
+            });
+    } else {
+        executeSave();
     }
-    var hexGrid = "";
-    for (var i = 0; i < shortGrid.length; i += 4) {
-        var temp = shortGrid.substring(i, i + 4);
-        temp = parseInt(temp, 2).toString(16).toUpperCase();
-        hexGrid += temp;
-    }
-    console.log(hexGrid.length);
-    dummy.value = hexGrid;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-
-    swal("Kopiert!", "Der Code für das Level wurde in deine Zwischenablage gelegt!", "success"); */
-    if(!user) {
-    swal({
-        title: "Name",
-        text: "Wie möchtest du heißen?",
-        content: "input",
-    })
-        .then(gname => {
-
-            if (gname != "") {
-                user = gname;
-            } else {
-                user = "Player 0";
-            }
-            executeSave();
-
-        });}else {
-            executeSave();
-        }
 }
 
 function executeSave() {
-    var number = random(0, 9);
-    swal({
-        icon: "success",
-        title: "Gespeichert!",
-        text: "Das Level wurde unter " + number + " gespeichert",
-    })
-    document.title = number;
-    var shortGrid = "";
-    for (var y = 0; y < columns; y++) {
-        for (var x = 0; x < rows; x++) {
-            shortGrid += (grid[x][y].mine) ? 1 : 0;
+    var ref = firebase.database().ref("/Aktuell");
+    ref.once("value", function (sn) {
+        number = sn.val();
+        if (number > 9) {
+            var ref = firebase.database().ref("/Aktuell");
+            ref.set(0);
+            number = 0;
         }
-    }
-    var ref = firebase.database().ref(number);
-    ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte }] });
-    online = number;
-    downloadUser();
-    userID = 0;
-    startTime = new Date().getTime() /1000;
+        swal({
+            icon: "success",
+            title: "Gespeichert!",
+            text: "Das Level wurde unter " + number + " gespeichert",
+        })
+            .then(v => {
+                finished = false;
+            });
+        document.title = number;
+        var shortGrid = "";
+        for (var y = 0; y < columns; y++) {
+            for (var x = 0; x < rows; x++) {
+                shortGrid += (grid[x][y].mine) ? 1 : 0;
+            }
+        }
+        var ref = firebase.database().ref(number);
+        ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte }] });
+        var ref = firebase.database().ref("/Aktuell");
+        ref.set(number + 1);
+        online = number;
+        downloadUser();
+        userID = 0;
+    });
 }
 
 function load() {
-    /* finished = true;
-    swal({
-        title: "Füge den Code für das zu ladende Level hier ein:",
-        content: "input",
-    })
-        .then(code => {
-            if (code) {
-                var binGrid = "";
-
-                for (var i = 0; i < code.length; i++) {
-                    if (i == code.length - 1 && code.length < 25) {
-                        var temp = code[i];
-                        temp = parseInt(temp, 16).toString(2);
-                        binGrid += temp;
-                    } else {
-                        var temp = code[i];
-                        temp = parseInt(temp, 16).toString(2).padStart(4, '0');
-                        binGrid += temp;
-                    }
-                }
-                while (binGrid.length < 81 && binGrid.length >= 71) {
-                    code = "0" + code;
-                }
-                while (binGrid.length < 256 && binGrid.length >= 246) {
-                    code = "0" + code;
-                }
-                while (binGrid.length < 484 && binGrid.length >= 474) {
-                    code = "0" + code;
-                }
-                reihen = Math.sqrt(binGrid.length);
-                berechneScale();
-                binGrid = Array.from(binGrid);
-                initGrid();
-                for (var y = 0; y < columns; y++) {
-                    for (var x = 0; x < rows; x++) {
-                        grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
-                    }
-                }
-                finished = false;
-            }
-        }); */
     finished = true;
     swal({
         title: "Füge den Code für das zu ladende Level hier ein:",
@@ -433,11 +384,10 @@ function load() {
 
                         if (gname != "") {
                             user = gname;
-                        }
-                        executeLoad(code);
+                        } executeLoad(code);
 
                     });
-            }else if(code && user) {
+            } else if (code && user) {
                 executeLoad(code);
             }
 
@@ -466,11 +416,6 @@ function executeLoad(code) {
             online = code;
             addUser();
             downloadUser();
-            startTime = new Date().getTime() / 1000;
         }
     });
-}
-
-function getName() {
-
 }
