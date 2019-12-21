@@ -25,9 +25,14 @@ var fertig = false;
 var user = "Player";
 var userID;
 var online = -1;
+var ip;
 
 var startTime;
-var time;
+var time = 0;
+$.getJSON("https://api.ipify.org?format=json",
+    function (data) {
+        ip = data.ip;
+    });
 
 swal({
     title: "Willkommen!",
@@ -225,7 +230,7 @@ function addUser() {
                 user = "Player " + users.length;
             }
             userID = users.length;
-            users.push({ Name: user, Punkte: punkte });
+            users.push({ Name: user, Punkte: punkte, IP: ip });
             ref.set(users);
         }
     });
@@ -241,8 +246,7 @@ function rangliste(u) {
         } else {
             document.getElementById("punkte").innerHTML += "0s" + "<br>";
         }
-        if(u[k].Fertig)
-        {
+        if (u[k].Fertig) {
             document.getElementById("punkte").innerHTML += " ✅<br>";
         } else {
             document.getElementById("punkte").innerHTML += "<br>";
@@ -360,10 +364,10 @@ function executeSave() {
             }
         }
         var ref = firebase.database().ref(number);
-        console.log(finished);
-        if(fertig == false){
-        ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte,Zeit: Math.floor(time) }] });} else {
-            ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte,Zeit: Math.floor(time),Fertig: 1 }] });
+        if (fertig == false) {
+            ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte, IP: ip, Zeit: Math.floor(time) }] });
+        } else {
+            ref.set({ Grid: shortGrid, User: [{ Name: user, Punkte: punkte, IP: ip, Zeit: Math.floor(time), Fertig: 1 }] });
         }
         var ref = firebase.database().ref("/Aktuell");
         ref.set(number + 1);
@@ -380,7 +384,7 @@ function load() {
         content: "input",
     })
         .then(code => {
-            if (code && !user) {
+            if (code && user == "Player") {
 
                 swal({
                     title: "Name",
@@ -404,25 +408,62 @@ function load() {
 
 
 function executeLoad(code) {
-    var ref = firebase.database().ref(code + "/Grid");
-    var binGrid = "";
-    document.title = code;
+    ctx.fillStyle = "#005f20a1";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    var ref = firebase.database().ref(code);
     ref.once("value", function (sn) {
-        binGrid = sn.val();
-        if (binGrid) {
-            reihen = Math.sqrt(binGrid.length);
-            berechneScale();
-            binGrid = Array.from(binGrid);
-            initGrid();
-            for (var y = 0; y < columns; y++) {
-                for (var x = 0; x < rows; x++) {
-                    grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+        if (sn.val()) {
+            var temp = sn.val();
+            var bereitsGespielt = false;
+            for (var x in temp.User) {
+                if (temp.User[x].IP == ip) {
+                    bereitsGespielt = true;
                 }
             }
-            finished = false;
-            online = code;
-            addUser();
-            downloadUser();
+
+            if (bereitsGespielt == false) {
+                var binGrid = "";
+                document.title = code;
+                binGrid = temp.Grid;
+                reihen = Math.sqrt(binGrid.length);
+                berechneScale();
+                binGrid = Array.from(binGrid);
+                initGrid();
+                for (var y = 0; y < columns; y++) {
+                    for (var x = 0; x < rows; x++) {
+                        grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                    }
+                }
+                finished = false;
+                online = code;
+                addUser();
+                downloadUser();
+            } else {
+                var binGrid = "";
+                document.title = code;
+                binGrid = temp.Grid;
+                reihen = Math.sqrt(binGrid.length);
+                berechneScale();
+                binGrid = Array.from(binGrid);
+                initGrid();
+                for (var y = 0; y < columns; y++) {
+                    for (var x = 0; x < rows; x++) {
+
+
+                        grid[x][y].mine = (binGrid[x + y * columns] == "0") ? false : true;
+                        grid[x][y].show("white");
+                        if (grid[x][y].mine) {
+                            drawCircle(grid[x][y].x * scale, grid[x][y].y * scale, "red");
+                        }
+                    }
+                }
+
+                online = code;
+                finished = true;
+                downloadUser();
+            }
         }
     });
+
+
 }
