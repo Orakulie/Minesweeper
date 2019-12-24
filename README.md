@@ -1,9 +1,9 @@
 # Minesweeper
-•Linksklick um Felder aufzudecken.
-•Rechtsklick um Minen zu entschärfen.
-•Wenn du eine Mine aufdeckst, ohne sie zu entschärfen gibt es 5 Punkte Abzug.
-•Solltest du versuchst ein Feld zu entschärfen, welches keine Mine ist, gibt es ebenfalls 5 Punkte Abzug.
-•Wenn du eine Mine richtig entschärfst, bekommst du 3 Punkte.
+•Linksklick um Felder aufzudecken.<br>
+•Rechtsklick um Minen zu entschärfen.<br>
+•Wenn du eine Mine aufdeckst, ohne sie zu entschärfen gibt es 5 Punkte Abzug.<br>
+•Solltest du versuchst ein Feld zu entschärfen, welches keine Mine ist, gibt es ebenfalls 5 Punkte Abzug.<br>
+•Wenn du eine Mine richtig entschärfst, bekommst du 3 Punkte.<br><br>
 
 
 Wenn man ein Level lädt oder teilt, wird der Score live übertragen,
