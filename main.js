@@ -29,7 +29,9 @@ var online = -1;
 var startTime;
 var time = 0;
 
-
+if(document.body.clientWidth < 546) {
+    document.getElementById("regeln").style.display = "none";
+}
 swal({
     title: "Willkommen!",
     text: "Möchtest du ein neues Level anfangen oder eins laden?",
